@@ -41,7 +41,10 @@ async function run() {
     const libraryCollection = client.db('LibraryDB').collection('books');
 
     // Get Book
-    
+    app.get('/books', async(req, res) => {
+       const books = await libraryCollection.find().toArray();
+       res.send(books);
+    })
 
     // Add Book
     app.post('/addBook', async(req, res) => {
