@@ -93,6 +93,19 @@ async function run() {
       res.send(result);
     });
 
+    // Increase Quantity
+    app.patch('/bookReduce/:id', async (req, res) => {
+      const id = req.params.id;
+      const { quantity } = req.body; 
+      console.log(quantity)
+      const query = { _id: new ObjectId(id) };
+      const updateQuantity = quantity + 1;
+      const update = { $set: { quantity: updateQuantity } }; 
+      console.log(updateQuantity)
+      const result = await libraryCollection.updateOne(query, update);
+      res.send(result);
+    });
+
 
     // --- Borrow -----
     // POst 
@@ -108,6 +121,14 @@ async function run() {
       const result = await borrowCollection.find(query).toArray();
       res.send(result);
     })
+
+    //Delete Borrowed
+    app.delete("/deleteBorrow/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await borrowCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
