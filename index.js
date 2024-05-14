@@ -33,6 +33,7 @@ async function run() {
     await client.connect();
 
     const libraryCollection = client.db("LibraryDB").collection("books");
+    const borrowCollection = client.db("LibraryDB").collection("borrow");
 
     // Get Book
     app.get("/books", async (req, res) => {
@@ -81,6 +82,15 @@ async function run() {
       const result = await libraryCollection.deleteOne(query);
       res.send(result);
     });
+
+
+    // --- Borrow -----
+    // POst 
+    app.post('/borrow', async(req, res) => {
+      const body = req.body;
+      const result = await borrowCollection.insertOne(body);
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
