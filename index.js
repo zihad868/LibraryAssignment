@@ -33,7 +33,7 @@ async function run() {
     await client.connect();
 
     const libraryCollection = client.db("LibraryDB").collection("books");
-    const borrowCollection = client.db("LibraryDB").collection("borrow");
+    const borrowCollection = client.db("BorrowDB").collection("borrow");
 
     // Get Book
     app.get("/books", async (req, res) => {
@@ -83,6 +83,16 @@ async function run() {
       res.send(result);
     });
 
+    app.patch('/book/:id', async (req, res) => {
+      const id = req.params.id;
+      const { quantity } = req.body; 
+      const query = { _id: new ObjectId(id) };
+      const updateQuantity = quantity - 1;
+      const update = { $set: { quantity: updateQuantity } }; 
+      const result = await libraryCollection.updateOne(query, update);
+      res.send(result);
+    });
+
 
     // --- Borrow -----
     // POst 
@@ -95,7 +105,7 @@ async function run() {
     app.get('/borrow/:email', async(req, res) => {
       const email = req.params.email;
       const query = {userEmail: email}
-      const result = await borrowCollection.findOne(query);
+      const result = await borrowCollection.find(query).toArray();
       res.send(result);
     })
 
