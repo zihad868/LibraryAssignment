@@ -2,14 +2,8 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const cors = require("cors");
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 2000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-
-const corsOptions = {
-  origin: ["http://localhost:5173/"],
-  credentials: true,
-  optionSuccessStatus: 200,
-};
 
 // Middleware
 app.use(cors());
@@ -30,7 +24,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const libraryCollection = client.db("LibraryDB").collection("books");
     const borrowCollection = client.db("BorrowDB").collection("borrow");
@@ -83,44 +77,43 @@ async function run() {
       res.send(result);
     });
 
-    app.patch('/book/:id', async (req, res) => {
+    app.patch("/book/:id", async (req, res) => {
       const id = req.params.id;
-      const { quantity } = req.body; 
+      const { quantity } = req.body;
       const query = { _id: new ObjectId(id) };
       const updateQuantity = quantity - 1;
-      const update = { $set: { quantity: updateQuantity } }; 
+      const update = { $set: { quantity: updateQuantity } };
       const result = await libraryCollection.updateOne(query, update);
       res.send(result);
     });
 
     // Increase Quantity
-    app.patch('/bookReduce/:id', async (req, res) => {
+    app.patch("/bookReduce/:id", async (req, res) => {
       const id = req.params.id;
-      const { quantity } = req.body; 
-      console.log("-->", quantity)
+      const { quantity } = req.body;
+      console.log("-->", quantity);
       const query = { _id: new ObjectId(id) };
       const updateQuantity = quantity + 1;
-      const update = { $set: { quantity: updateQuantity } }; 
-      console.log("-->",updateQuantity)
+      const update = { $set: { quantity: updateQuantity } };
+      console.log("-->", updateQuantity);
       const result = await libraryCollection.updateOne(query, update);
       res.send(result);
     });
 
-
     // --- Borrow -----
-    // POst 
-    app.post('/borrow', async(req, res) => {
+    // POst
+    app.post("/borrow", async (req, res) => {
       const body = req.body;
       const result = await borrowCollection.insertOne(body);
       res.send(result);
-    })
+    });
 
-    app.get('/borrow/:email', async(req, res) => {
+    app.get("/borrow/:email", async (req, res) => {
       const email = req.params.email;
-      const query = {userEmail: email}
+      const query = { userEmail: email };
       const result = await borrowCollection.find(query).toArray();
       res.send(result);
-    })
+    });
 
     //Delete Borrowed
     app.delete("/deleteBorrow/:id", async (req, res) => {
@@ -131,7 +124,7 @@ async function run() {
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
